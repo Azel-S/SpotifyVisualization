@@ -1,5 +1,8 @@
 # SpotifyViz - Frontend (Angular)
 
+## Add missing dependenices
+Run `npm install`.
+
 ## Local Server
 Run `ng serve`. Navigate to `http://localhost:4200/`.
 
