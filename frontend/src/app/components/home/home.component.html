@@ -1,0 +1,16 @@
+<div class="container-v-c">
+  <h1>Hello, This is Spotify-Viz!</h1>
+  <p>Please edit the following paramters to test get/post requests.</p>
+
+  <div class="container-h-l">
+    <p style="margin-right: 10px;">API:</p>
+    <input #uAPI style="margin-right: 20px;" type="url" value="https://catfact.ninja/fact">
+
+    <button (click)="get(uAPI.value)">GET</button>
+    <button (click)="post(uAPI.value)">POST</button>
+  </div>
+
+  <div class="container-h-l">
+    <p>Result: {{this.result}}</p>
+  </div>
+</div>
