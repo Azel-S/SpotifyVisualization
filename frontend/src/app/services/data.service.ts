@@ -16,6 +16,6 @@ export class DataService {
   }
 
   async post_test(api: string) {
-    return await lastValueFrom(this.http.post<any>(api, { headers: new HttpHeaders({}), message: "Hello there!" }));
+    return await lastValueFrom(this.http.post<any>(api, { headers: new HttpHeaders({}), message: 14 }));
   }
 }

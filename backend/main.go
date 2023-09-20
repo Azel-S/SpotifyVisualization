@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"reflect"
 	"time"
@@ -54,15 +55,19 @@ func main() {
 			return
 		}
 		var args map[string]any
+		b, err := io.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
 
-		err := json.NewDecoder(r.Body).Decode(&args)
+		err = json.Unmarshal(b, &args)
 		if err != nil {
 			writeError(w, fmt.Sprintln(err))
 			return
 		}
-		valToInsert, ok := args["val"].(float64)
+		valToInsert, ok := args["message"].(float64)
 		if !ok {
-			writeError(w, fmt.Sprintln(args["val"], "is not an integer but a", reflect.TypeOf(args["val"])))
+			writeError(w, fmt.Sprintln(args["message"], "is not an integer but a", reflect.TypeOf(args["message"])))
 			return
 		}
 		stmt, err := conn.PrepareContext(ctx, "INSERT INTO a(b) values(:1)")
