@@ -38,9 +38,12 @@ func main() {
 		panic(err)
 	}
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintln(w, "<html><body>Hi, this is an API backend so you shouldn't be here")
 	})
 	http.HandleFunc("/api/v0/add-value", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "content-type")
 		ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 		defer func() {
 			cancel()
@@ -73,6 +76,7 @@ func main() {
 	})
 
 	http.HandleFunc("/api/v0/get-value", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 		defer func() {
 			cancel()
@@ -100,7 +104,9 @@ func main() {
 			ints = append(ints, v)
 		}
 		msg := map[string]any{
-			"result": ints,
+			"fact": map[string]any{
+				"result": ints,
+			},
 		}
 		b, err := json.Marshal(msg)
 		if err != nil {
