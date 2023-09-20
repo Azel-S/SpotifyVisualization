@@ -65,6 +65,7 @@ func main() {
 			writeError(w, fmt.Sprintln(err))
 			return
 		}
+		fmt.Println(args)
 		valToInsert, ok := args["message"].(float64)
 		if !ok {
 			writeError(w, fmt.Sprintln(args["message"], "is not an integer but a", reflect.TypeOf(args["message"])))
