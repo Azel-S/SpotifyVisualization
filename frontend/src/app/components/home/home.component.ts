@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
-import { TabsComponent } from 'src/app/tabs/tabs.component';
-import { EChartsOption } from 'echarts';
+import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'app-root',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
-  constructor(private service: DataService) {}
 
+export class HomeComponent {
+  constructor(private service: DataService) { }
+
+  public chart: any;
   result: string = 'Awaiting button press.';
 
   get(api: string) {
@@ -48,20 +49,32 @@ export class HomeComponent {
         console.log(res);
       });
   }
-  // Charts
-  chartOption: EChartsOption = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        data: [820, 932, 901, 934, 1290, 1330, 1320],
-        type: 'line',
+
+  createChart() {
+    this.chart = new Chart("MyChart", {
+      type: 'bar', //this denotes tha type of chart
+
+      data: {// values on X-Axis
+        labels: ['2022-05-10', '2022-05-11', '2022-05-12', '2022-05-13',
+          '2022-05-14', '2022-05-15', '2022-05-16', '2022-05-17',],
+        datasets: [
+          {
+            label: "Sales",
+            data: ['467', '576', '572', '79', '92',
+              '574', '573', '576'],
+            backgroundColor: 'blue'
+          },
+          {
+            label: "Profit",
+            data: ['542', '542', '536', '327', '17',
+              '0.00', '538', '541'],
+            backgroundColor: 'limegreen'
+          }
+        ]
       },
-    ],
-  };
+      options: {
+        aspectRatio: 2.5
+      }
+    });
+  }
 }

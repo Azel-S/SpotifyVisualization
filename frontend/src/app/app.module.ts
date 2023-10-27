@@ -5,8 +5,6 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { MatTabsModule } from '@angular/material/tabs';
 
-import { NgxEchartsModule } from 'ngx-echarts';
-
 // Components
 // NOTE (Abbas): It seems GitHub pages does not supports routing, so avoid it if possible.
 import { HomeComponent } from './components/home/home.component';
@@ -18,9 +16,6 @@ import { HomeComponent } from './components/home/home.component';
     HttpClientModule,
     BrowserAnimationsModule,
     MatTabsModule,
-    NgxEchartsModule.forRoot({
-      echarts: () => import('echarts'),
-    }),
   ],
   providers: [],
   bootstrap: [HomeComponent],

@@ -1,6 +1,7 @@
 <mat-tab-group>
   <mat-tab label="Sample Query">
-    <div echarts [options]="chartOption" class="demo-chart"></div>
+    <button (click)="createChart()">Create Chart</button>
+    <canvas id="MyChart">{{ chart }}</canvas>
   </mat-tab>
   <mat-tab label="API Testing">
     <div class="container-v-c">
@@ -9,12 +10,7 @@
 
       <div class="container-h-l">
         <p style="margin-right: 10px">API:</p>
-        <input
-          #uAPI
-          style="margin-right: 20px"
-          type="url"
-          value="https://catfact.ninja/fact"
-        />
+        <input #uAPI style="margin-right: 20px" type="url" value="https://catfact.ninja/fact" />
         <button (click)="get(uAPI.value)">GET</button>
         <button (click)="post(uAPI.value)">POST</button>
       </div>
