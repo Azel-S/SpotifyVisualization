@@ -7,16 +7,32 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"time"
 
+	"github.com/joho/godotenv"
 	go_ora "github.com/sijms/go-ora/v2"
 )
 
+// Get information from .env file.
+func getEnv(key string) string {
+
+	// load .env file
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
+}
+
 func main() {
-	username := flag.String("user", "", "Gatorlink user")
-	password := flag.String("password", "", "Oracle password")
+	username := flag.String("user", getEnv("USER"), "Gatorlink user")
+	password := flag.String("password", getEnv("PASSWORD"), "Oracle password")
 	flag.Parse()
 	if username == nil || *username == "" {
 		panic("Username should not be empty")
