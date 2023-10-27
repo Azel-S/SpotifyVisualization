@@ -1,44 +1,48 @@
 /* Vertical Center */
 .container-v-c {
-    display: flex;
-    flex-flow: column nowrap;
+  display: flex;
+  flex-flow: column nowrap;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Vertical Left */
 .container-v-l {
-    display: flex;
-    flex-flow: column nowrap;
+  display: flex;
+  flex-flow: column nowrap;
 
-    align-items: flex-start;
-    justify-content: center;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 /* Horizontal Center */
 .container-h-c {
-    display: flex;
-    flex-flow: row nowrap;
+  display: flex;
+  flex-flow: row nowrap;
 
-    align-items: center;
-    justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Horizontal Left */
 .container-h-l {
-    display: flex;
-    flex-flow: row nowrap;
+  display: flex;
+  flex-flow: row nowrap;
 
-    align-items: center;
-    justify-content: flex-start;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .margin-right {
-    margin-right: 20px;
+  margin-right: 20px;
 }
 
 button {
-    margin-right: 20px;
-    height: 20px;
+  margin-right: 20px;
+  height: 20px;
+}
+
+.demo-chart {
+  height: 400px;
 }
