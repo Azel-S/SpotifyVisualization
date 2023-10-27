@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http'
 // Components
 // NOTE (Abbas): It seems GitHub pages does not supports routing, so avoid it if possible.
 import { HomeComponent } from './components/home/home.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { HomeComponent } from './components/home/home.component';
   ],
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [HomeComponent]
