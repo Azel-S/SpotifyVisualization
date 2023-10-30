@@ -1,2 +1,6 @@
+# .env files contain sensitive information.
+*.env
+# .csv files are too big, accidental commit/push will lead to hell.
+*.csv
+# Was already here, don't want to find out why.
 /backend/db
-backend/.env
