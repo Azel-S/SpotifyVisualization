@@ -54,8 +54,8 @@ def main():
                         "http://api.spotify.com/v1/artists/" + artist["id"], headers={"Authorization": "Bearer " + token})
                     
                     if (artist_response.status_code == 429):
-                        print("XXX Artist: Sleeping for: " + str(track_response.headers["Retry-After"]))
-                        time.sleep(int(track_response.headers["Retry-After"]))
+                        print("XXX Artist: Sleeping for: " + str(artist_response.headers["Retry-After"]))
+                        time.sleep(int(artist_response.headers["Retry-After"]))
 
                     if artist_response.ok:
                         artist_json = artist_response.json()
@@ -96,4 +96,5 @@ def main():
         artistsFile.close()
         artistGenresFile.close()
 
-main()
+if(__name__ == "__main__"):
+    main()
