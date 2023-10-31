@@ -4,3 +4,4 @@
 *.csv
 # Was already here, don't want to find out why.
 /backend/db
+/backend/.env
