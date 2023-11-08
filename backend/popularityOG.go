@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func findPopularity(w http.ResponseWriter, r *http.Request) {
-	sql := "SELECT track_id,release_date, popularity FROM Track GROUP BY EXTRACT(YEAR FROM release_date) ORDER BY popularity DESC, EXTRACT(YEAR FROM release_date) DESC"
+func findPopularity2(w http.ResponseWriter, r *http.Request) {
+	sql := "SELECT popularity, danceability, energy, Track_Genre.genre FROM Track JOIN Track_Genre ON Track_Genre.track_id=Track.track_id WHERE title like '%' || :1 ||'%' "
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer func() {
@@ -29,24 +29,26 @@ func findPopularity(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		popularityReturn := []PopularityReturn{}
+		popularityReturn2 := []PopularityReturn2{}
 		for res.Next() {
-			var track_id string
-			var release_date string
 			var popularity int
-			err := res.Scan(&track_id, &release_date, &popularity)
+			var danceability float64
+			var energy float64
+			var genre string
+			err := res.Scan(&popularity, &danceability, &energy, &genre)
 			if err != nil {
 				panic(err)
 			}
-			popularityReturn = append(popularityReturn, PopularityReturn{
-				Track_id:     track_id,
-				Release_date: release_date,
+			popularityReturn2 = append(popularityReturn2, PopularityReturn2{
 				Popularity:   popularity,
+				Danceability: danceability,
+				Energy:       energy,
+				Genre:        genre,
 			})
 
 		}
 		msg := map[string]any{
-			"result": popularityReturn,
+			"result": popularityReturn2,
 		}
 		b, err := json.Marshal(msg)
 		if err != nil {
@@ -59,8 +61,9 @@ func findPopularity(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type PopularityReturn struct {
-	Track_id     string `json:"track_id"`
-	Release_date string `json:"release_date"`
-	Popularity   int    `json:"popularity"`
+type PopularityReturn2 struct {
+	Popularity   int     `json:"popularity"`
+	Danceability float64 `json:"danceability"`
+	Energy       float64 `json:"energy"`
+	Genre        string  `json:"genre"`
 }
