@@ -46,3 +46,19 @@ button {
 .demo-chart {
   height: 400px;
 }
+
+.year-input {
+  display: flex;
+  justify-content: center;
+}
+input {
+  width: 100px;
+}
+submit {
+  padding-left: 20px;
+}
+
+.regions {
+  display: flex;
+  justify-content: center;
+}

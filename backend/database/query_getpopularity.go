@@ -3,6 +3,7 @@ package database
 import (
 	"backend/utils"
 	"net/http"
+	"strconv"
 )
 
 // Gets popularity (From start_year to end_year)
@@ -15,28 +16,34 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Input Structure
+		// Input structure
 		var input struct {
-			StartYear int `json:"start_year"`
-			EndYear   int `json:"end_year"`
+			StartYear int
+			EndYear   int
 		}
 
 		// Output structure
 		var output struct {
-			Year       []int     `json:"year"`
-			Popularity []float64 `json:"popularity"`
+			Years       []int     `json:"years"`
+			Popularities []float64 `json:"popularities"`
 		}
 
-		// Decode given JSON into input structure
-		err := utils.DecodeJSON(w, r, &input)
-		if err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+		// Grab input values from url
+		if r.URL.Query().Get("start_year") == "" {
+			input.StartYear = 1900
+		} else {
+			input.StartYear, _ = strconv.Atoi(r.URL.Query().Get("start_year"))
+		}
+
+		if r.URL.Query().Get("end_year") == "" {
+			input.EndYear = 2021
+		} else {
+			input.EndYear, _ = strconv.Atoi(r.URL.Query().Get("end_year"))
 		}
 
 		// Execute query
 		rows, err := db.database.Query(`
-			SELECT      t.release_year, MAX(t.popularity)
+			SELECT      t.release_year, SUM(t.popularity)
 			FROM        "SHAH.S".tracks t
 			WHERE       t.release_year >= :1 AND
 						t.release_year <= :2
@@ -63,8 +70,8 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// The temporary variables are appended to the output structure
-			output.Year = append(output.Year, year)
-			output.Popularity = append(output.Popularity, popularity)
+			output.Years = append(output.Years, year)
+			output.Popularities = append(output.Popularities, popularity)
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, output)
