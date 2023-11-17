@@ -21,7 +21,7 @@ func getEnv(key string) string {
 }
 
 func main() {
-	// Connect to databse (make sure UF VPN is active)
+	// Connect to database (make sure UF VPN is active)
 	db := database.DB{}
 	db.Initalize(getEnv("USER"), getEnv("PASSWORD"))
 
