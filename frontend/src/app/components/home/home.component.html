@@ -1,23 +1,41 @@
+<div class="container-h-c">
+  <input matInput name="api" [(ngModel)]="api" />
+  <button mat-raised-button color="accent" (click)="saveAPI()">Save</button>
+</div>
+
 <mat-tab-group>
   <mat-tab label="Sample Query">
-    <button (click)="createChart()">Create Chart</button>
-    <canvas id="Loudness over Time">{{ chart }}</canvas>
-  </mat-tab>
-  <mat-tab label="API Testing">
-    <div class="container-v-c">
-      <h1>Hello, This is Spotify-Viz!</h1>
-      <p>Please edit the following paramters to test get/post requests.</p>
-
-      <div class="container-h-l">
-        <p style="margin-right: 10px">API:</p>
-        <input #uAPI style="margin-right: 20px" type="url" value="https://catfact.ninja/fact" />
-        <button (click)="get(uAPI.value)">GET</button>
-        <button (click)="post(uAPI.value)">POST</button>
-      </div>
-
-      <div class="container-h-l">
-        <p>Result: {{ this.result }}</p>
-      </div>
+    <canvas id="Popularity over Time">{{ popularity }}</canvas>
+    <div class="year-input">
+      <input matInput name="startYear" [(ngModel)]="startYear" />
+      <input matInput name="endYear" [(ngModel)]="endYear" />
+      <button mat-raised-button color="accent" (click)="submit()">
+        Submit
+      </button>
     </div>
   </mat-tab>
+  <mat-tab label="Query 2"> </mat-tab>
 </mat-tab-group>
+
+<!-- Code used to update Country Comparsions -->
+<div class="regions">
+  <div class="dropdown">
+    <mat-form-field>
+      <mat-label>Region</mat-label>
+      <mat-select [(ngModel)]="selectedValue1" name="region">
+        <mat-option *ngFor="let region of regions" [value]="region.value">{{
+          region.viewValue
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Region</mat-label>
+    <mat-select [(ngModel)]="selectedValue2" name="region">
+      <mat-option *ngFor="let region of regions" [value]="region.value">{{
+        region.viewValue
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

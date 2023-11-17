@@ -3,6 +3,7 @@ package database
 import (
 	"backend/utils"
 	"net/http"
+	"strconv"
 )
 
 // Template Function, modify as needed
@@ -28,11 +29,11 @@ func (db *DB) Template(w http.ResponseWriter, r *http.Request) {
 			Loudness []float64 `json:"loudness"`
 		}
 
-		// Decode given JSON into input structure
-		err := utils.DecodeJSON(w, r, &input)
-		if err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+		// Grab input values from url
+		if r.URL.Query().Get("start_year") == "" {
+			input.StartYear = 1900
+		} else {
+			input.StartYear, _ = strconv.Atoi(r.URL.Query().Get("start_year"))
 		}
 
 		// Execute query

@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class DataService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  private api = 'to-be-determined';
-
-  async get_test(api: string) {
-    return await lastValueFrom(this.http.get<any>(api, { headers: new HttpHeaders({}) }));
-  }
-
-  async post_test(api: string) {
-    return await lastValueFrom(this.http.post<any>(api, { headers: new HttpHeaders({}), message: 14 }));
+  async get_popularity(api: string, startYear: number, endYear: number) {
+    let params = new HttpParams()
+      .set('start_year', startYear)
+      .set('end_year', endYear);
+    return await lastValueFrom(
+      this.http.get<any>(api + '/api/v0/GetPopularity', {
+        headers: new HttpHeaders({}),
+        params: params,
+      })
+    );
   }
 }
