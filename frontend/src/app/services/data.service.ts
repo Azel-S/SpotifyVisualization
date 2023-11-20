@@ -19,4 +19,16 @@ export class DataService {
       })
     );
   }
+
+  async get_explicit(api: string, startYear: number, endYear: number) {
+    let params = new HttpParams()
+      .set('start_year', startYear)
+      .set('end_year', endYear);
+    return await lastValueFrom(
+      this.http.get<any>(api + '/api/v0/GetExplicit', {
+        headers: new HttpHeaders({}),
+        params: params,
+      })
+    );
+  }
 }

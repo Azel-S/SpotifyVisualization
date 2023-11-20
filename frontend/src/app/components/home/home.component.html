@@ -14,7 +14,16 @@
       </button>
     </div>
   </mat-tab>
-  <mat-tab label="Query 2"> </mat-tab>
+  <mat-tab label="Explicit Tracks">
+    <canvas id="Explicit Tracks over Time">{{ explicit }}</canvas>
+    <div class="year-input">
+      <input matInput name="startYear" [(ngModel)]="startYear" />
+      <input matInput name="endYear" [(ngModel)]="endYear" />
+      <button mat-raised-button color="accent" (click)="submitEx()">
+        Submit
+      </button>
+    </div>
+  </mat-tab>
 </mat-tab-group>
 
 <!-- Code used to update Country Comparsions -->

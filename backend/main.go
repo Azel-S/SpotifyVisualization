@@ -27,6 +27,7 @@ func main() {
 
 	// Set API links to be handled
 	http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
+	http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
 	// http.HandleFunc("/api/v0/query_1", db.query_2)
 
 	// Start server

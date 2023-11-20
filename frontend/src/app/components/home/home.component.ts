@@ -20,6 +20,11 @@ export class HomeComponent {
     active: false,
   };
 
+  explicit: { chart: any; active: boolean } = {
+    chart: Chart,
+    active: false,
+  };
+
   api: string = localStorage.getItem('api') as string;
 
   startYear = 1900;
@@ -75,6 +80,51 @@ export class HomeComponent {
           };
 
           this.popularity.chart.update();
+        } else {
+          ('Get request failed, read console for more information.');
+          console.log(res);
+        }
+      })
+      .catch((res) => {
+        console.log(res);
+      });
+  }
+
+  submitEx() {
+    this.service
+      .get_explicit(
+        localStorage.getItem('api') as string,
+        this.startYear,
+        this.endYear
+      )
+      .then((res) => {
+        if (res.years && res.explicit) {
+          if (!this.explicit.active) {
+            this.explicit.active = true;
+
+            this.explicit.chart = new Chart('Explicit Tracks over Time', {
+              type: 'line',
+              data: {
+                labels: [],
+                datasets: [],
+              },
+              options: {
+                aspectRatio: 2.5,
+              },
+            });
+          }
+
+          this.explicit.chart.data = {
+            labels: res.years,
+            datasets: [
+              {
+                label: 'Explicit',
+                data: res.explicit,
+              },
+            ],
+          };
+
+          this.explicit.chart.update();
         } else {
           ('Get request failed, read console for more information.');
           console.log(res);
