@@ -10,3 +10,24 @@ Abbas Shah
 Carlo Quick  
 David Dexter  
 Sufia Rashid  
+
+## Getting Started
+**Go - after you have it installed**
+```
+cd backend
+go run main.go
+```
+
+**Serving Angular**
+```
+cd frontend
+ng serve
+```
+
+**Initializing ngrok**
+```
+cd backend
+ngrok http 8080
+```
+
+copy url into top box, submit and go!
