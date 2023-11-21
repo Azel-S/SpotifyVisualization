@@ -1,137 +1,63 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { Chart } from 'chart.js/auto';
-import { map } from 'rxjs';
-interface Regions {
-  value: string;
-  viewValue: string;
-}
+import { MatTabChangeEvent } from '@angular/material/tabs';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
+
 export class HomeComponent {
-  constructor(private service: DataService) {}
+  constructor(public service: DataService) {
+    this.service.update_years(this.years);
+    this.service.update_regions(this.regions);
+    this.service.update_genres(this.genres.list)
+    this.genres.filter = this.genres.control.valueChanges.pipe(startWith(''), map(value => this.filterGenre(value!)));
+  }
 
-  popularity: { chart: any; active: boolean } = {
-    chart: Chart,
-    active: false,
-  };
+  // VARIABLES
+  years: { min: number, max: number, selected_min: number, selected_max: number } = { min: 0, max: 0, selected_min: 0, selected_max: 0 }
+  regions: { list: string[], selected_1: string, selected_2: string } = { list: [], selected_1: "", selected_2: "" };
+  genres: { list: string[], control: FormControl, filter: Observable<string[]> } = { list: [], control: new FormControl(''), filter: new Observable<string[]>() }
+  charts: { popularity: Boolean, explicit: Boolean } = { popularity: false, explicit: false };
 
-  explicit: { chart: any; active: boolean } = {
-    chart: Chart,
-    active: false,
-  };
+  tabIndex: number = 0;
 
-  api: string = localStorage.getItem('api') as string;
+  // FUNCTIONS
+  updateTabIndex(event: MatTabChangeEvent) {
+    this.tabIndex = event.index;
+  }
 
-  startYear = 1900;
-  endYear = 2021;
-
-  selectedValue1: string = 'africa';
-  selectedValue2: string = 'asia';
-
-  regions: Regions[] = [
-    { value: 'africa', viewValue: 'Africa' },
-    { value: 'americas', viewValue: 'The Americas' },
-    { value: 'europe', viewValue: 'Europe' },
-    { value: 'oceania', viewValue: 'Oceania' },
-    { value: 'asia', viewValue: 'Asia' },
-  ];
-
-  saveAPI() {
-    localStorage.setItem('api', this.api);
+  filterGenre(value: string): string[] {
+    return this.genres.list.filter(option => option.toLowerCase().includes(value.toLowerCase()));
   }
 
   submit() {
-    this.service
-      .get_popularity(
-        localStorage.getItem('api') as string,
-        this.startYear,
-        this.endYear
-      )
-      .then((res) => {
-        if (res.years && res.popularities) {
-          if (!this.popularity.active) {
-            this.popularity.active = true;
+    if (this.tabIndex == 0) {
+      if (!this.charts.popularity) {
+        new Chart('popularity_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        this.charts.popularity = true;
+      }
 
-            this.popularity.chart = new Chart('Popularity over Time', {
-              type: 'bar',
-              data: {
-                labels: [],
-                datasets: [],
-              },
-              options: {
-                aspectRatio: 2.5,
-              },
-            });
-          }
+      this.service.update_popularity(this.years.selected_min, this.years.selected_max, Chart.getChart('popularity_chart')!);
+    } else if (this.tabIndex == 1) {
+      if (!this.charts.explicit) {
+        new Chart('explicit_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        this.charts.explicit = true;
+      }
 
-          this.popularity.chart.data = {
-            labels: res.years,
-            datasets: [
-              {
-                label: 'Popularity',
-                data: res.popularities,
-              },
-            ],
-          };
-
-          this.popularity.chart.update();
-        } else {
-          ('Get request failed, read console for more information.');
-          console.log(res);
-        }
-      })
-      .catch((res) => {
-        console.log(res);
-      });
+      this.service.update_explicit(this.years.selected_min, this.years.selected_max, Chart.getChart('explicit_chart')!);
+    } else {
+      this.service.notify("Unexpected tab, please investigate.");
+    }
   }
 
-  submitEx() {
-    this.service
-      .get_explicit(
-        localStorage.getItem('api') as string,
-        this.startYear,
-        this.endYear
-      )
-      .then((res) => {
-        if (res.years && res.explicit) {
-          if (!this.explicit.active) {
-            this.explicit.active = true;
-
-            this.explicit.chart = new Chart('Explicit Tracks over Time', {
-              type: 'line',
-              data: {
-                labels: [],
-                datasets: [],
-              },
-              options: {
-                aspectRatio: 2.5,
-              },
-            });
-          }
-
-          this.explicit.chart.data = {
-            labels: res.years,
-            datasets: [
-              {
-                label: 'Explicit',
-                data: res.explicit,
-              },
-            ],
-          };
-
-          this.explicit.chart.update();
-        } else {
-          ('Get request failed, read console for more information.');
-          console.log(res);
-        }
-      })
-      .catch((res) => {
-        console.log(res);
-      });
+  test() {
+    this.service.notify("Current Tab: " + this.tabIndex.toString());
   }
 }

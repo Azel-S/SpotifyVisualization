@@ -24,21 +24,17 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 
 		// Output structure
 		var output struct {
-			Years       []int     `json:"years"`
+			Years        []int     `json:"years"`
 			Popularities []float64 `json:"popularities"`
 		}
 
 		// Grab input values from url
-		if r.URL.Query().Get("start_year") == "" {
-			input.StartYear = 1900
-		} else {
+		if r.URL.Query().Get("start_year") != "" && r.URL.Query().Get("end_year") != "" {
 			input.StartYear, _ = strconv.Atoi(r.URL.Query().Get("start_year"))
-		}
-
-		if r.URL.Query().Get("end_year") == "" {
-			input.EndYear = 2021
-		} else {
 			input.EndYear, _ = strconv.Atoi(r.URL.Query().Get("end_year"))
+		} else {
+			utils.RespondWithError(w, http.StatusBadRequest, "start_year or end_year not specified")
+			return
 		}
 
 		// Execute query

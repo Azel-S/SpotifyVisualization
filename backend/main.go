@@ -26,6 +26,11 @@ func main() {
 	db.Initalize(getEnv("USER"), getEnv("PASSWORD"))
 
 	// Set API links to be handled
+	http.HandleFunc("/api/v0/GetYearRange", db.GetYearRange)
+	http.HandleFunc("/api/v0/GetRegions", db.GetRegions)
+	http.HandleFunc("/api/v0/GetGenres", db.GetGenres)
+
+	// Set API query links
 	http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
 	http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
 	// http.HandleFunc("/api/v0/query_1", db.query_2)
