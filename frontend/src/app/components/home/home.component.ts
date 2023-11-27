@@ -12,7 +12,6 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-
 export class HomeComponent {
   constructor(public service: DataService) {
     this.service.update_years(this.years);
@@ -28,7 +27,7 @@ export class HomeComponent {
   regions: { list: string[], selected_1: string, selected_2: string } = { list: [], selected_1: "", selected_2: "" };
   genre_1: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "pop", control: new FormControl(''), filter: new Observable<string[]>() }
   genre_2: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "rock", control: new FormControl(''), filter: new Observable<string[]>() }
-  charts: { popularity: Boolean, explicit: Boolean, genre: Boolean } = { popularity: false, explicit: false, genre: false };
+  charts: { popularity: Boolean, explicit: Boolean, duration: Boolean, genre: Boolean } = { popularity: false, explicit: false, duration: false, genre: false };
 
   tabIndex: number = 0;
 
@@ -56,18 +55,42 @@ export class HomeComponent {
   submit() {
     if (this.tabIndex == 0) {
       if (!this.charts.popularity) {
-        new Chart('popularity_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        new Chart('popularity_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
         this.charts.popularity = true;
       }
 
-      this.service.update_popularity(this.years.selected_min, this.years.selected_max, Chart.getChart('popularity_chart')!);
+      this.service.update_popularity(
+        this.years.selected_min,
+        this.years.selected_max,
+        Chart.getChart('popularity_chart')!
+      );
     } else if (this.tabIndex == 1) {
       if (!this.charts.explicit) {
-        new Chart('explicit_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        new Chart('explicit_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
         this.charts.explicit = true;
       }
 
       this.service.update_explicit(this.years.selected_min, this.years.selected_max, Chart.getChart('explicit_chart')!);
+    } else if (this.tabIndex == 2) {
+      if (!this.charts.duration) {
+        new Chart('duration_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
+        this.charts.duration = true;
+      }
+
+      this.service.update_duration(
+        this.years.selected_min,
+        this.years.selected_max,
+        Chart.getChart('duration_chart')!
+      )
     }
     else if (this.tabIndex == 3) {
       if (!this.charts.genre) {
@@ -77,11 +100,11 @@ export class HomeComponent {
 
       this.service.update_genre(this.years.selected_min, this.years.selected_max, this.genre_1.selected, this.genre_2.selected, Chart.getChart('genre_chart')!);
     } else {
-      this.service.notify("Unexpected tab, please investigate.");
+      this.service.notify('Unexpected tab, please investigate.');
     }
   }
 
   test() {
-    this.service.notify("Current Tab: " + this.tabIndex.toString());
+    this.service.notify('Current Tab: ' + this.tabIndex.toString());
   }
 }

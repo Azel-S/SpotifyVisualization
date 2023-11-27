@@ -1,46 +1,93 @@
 <mat-grid-list cols="3" rowHeight="2:3">
   <mat-grid-tile>
-    <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 20px 20px; height: 90vh;">
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 20px 20px;
+        height: 90vh;
+      "
+    >
       <!-- API URL -->
       <div>
         <form>
-          <mat-form-field style="width: 30vw;" appearance="outline">
+          <mat-form-field style="width: 30vw" appearance="outline">
             <mat-label>Backend URL</mat-label>
-            <input matInput #api value={{this.service.getAPI()}}>
-            <button *ngIf="this.service.getAPI() != api.value" matSuffix mat-icon-button color="accent" type="submit"
-              (click)="this.service.saveAPI(api.value)">
-              <mat-icon>{{'save'}}</mat-icon>
+            <input matInput #api value="{{ this.service.getAPI() }}" />
+            <button
+              *ngIf="this.service.getAPI() != api.value"
+              matSuffix
+              mat-icon-button
+              color="accent"
+              type="submit"
+              (click)="this.service.saveAPI(api.value)"
+            >
+              <mat-icon>{{ "save" }}</mat-icon>
             </button>
           </mat-form-field>
         </form>
       </div>
 
       <!-- INPUT PARAMS -->
-      <div style="display: flex; flex-direction: column; justify-content: center; gap: 20px 20px">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 20px 20px;
+        "
+      >
         <!-- YEAR RANGE -->
-        <mat-card style="width: 30vw; padding: 20px;">
-          <mat-card-title>{{"Year Range: " + years.selected_min + " to " + years.selected_max}}</mat-card-title>
-          <mat-slider min={{years.min}} max={{years.max}}>
-            <input [(ngModel)]="years.selected_min" matSliderStartThumb>
-            <input [(ngModel)]="years.selected_max" matSliderEndThumb>
+        <mat-card style="width: 30vw; padding: 20px">
+          <mat-card-title>{{
+            "Year Range: " + years.selected_min + " to " + years.selected_max
+          }}</mat-card-title>
+          <mat-slider min="{{ years.min }}" max="{{ years.max }}">
+            <input [(ngModel)]="years.selected_min" matSliderStartThumb />
+            <input [(ngModel)]="years.selected_max" matSliderEndThumb />
           </mat-slider>
         </mat-card>
 
         <!-- REGIONS -->
-        <mat-card *ngIf="[1, 3, 4].includes(tabIndex)"
-          style="width: 30vw; padding-top: 40px; padding-left: 20px; padding-bottom: 20px; padding-right: 20px;">
-          <div style="display: flex; direction: row;justify-content: center; align-items: center; gap: 20px 20px">
+        <mat-card
+          *ngIf="[1, 3, 4].includes(tabIndex)"
+          style="
+            width: 30vw;
+            padding-top: 40px;
+            padding-left: 20px;
+            padding-bottom: 20px;
+            padding-right: 20px;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              direction: row;
+              justify-content: center;
+              align-items: center;
+              gap: 20px 20px;
+            "
+          >
             <mat-form-field appearance="outline">
               <mat-label>Region 1</mat-label>
               <mat-select [(ngModel)]="regions.selected_1" name="selected_1">
-                <mat-option *ngFor="let region of regions.list" [value]="region">{{ region }}</mat-option>
+                <mat-option
+                  *ngFor="let region of regions.list"
+                  [value]="region"
+                  >{{ region }}</mat-option
+                >
               </mat-select>
             </mat-form-field>
             <mat-card-subtitle>VS</mat-card-subtitle>
             <mat-form-field appearance="outline">
               <mat-label>Region 2</mat-label>
               <mat-select [(ngModel)]="regions.selected_2" name="selected_2">
-                <mat-option *ngFor="let region of regions.list" [value]="region">{{ region }}</mat-option>
+                <mat-option
+                  *ngFor="let region of regions.list"
+                  [value]="region"
+                  >{{ region }}</mat-option
+                >
               </mat-select>
             </mat-form-field>
           </div>
@@ -76,24 +123,44 @@
       </div>
 
       <!-- SUBMIT (and possibly other) BUTTONS -->
-      <div style="display: flex; flex-direction: row; justify-content: center; gap: 20px 20px">
-        <button style="width: 25vh;" mat-raised-button color="accent" (click)="submit()">Submit</button>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          gap: 20px 20px;
+        "
+      >
+        <button
+          style="width: 25vh"
+          mat-raised-button
+          color="accent"
+          (click)="submit()"
+        >
+          Submit
+        </button>
         <!-- <button style="width: 25vh;" mat-raised-button color="accent" (click)="test()">Test</button> -->
       </div>
     </div>
   </mat-grid-tile>
   <mat-grid-tile colspan="2">
     <!-- TABS -->
-    <mat-tab-group (selectedTabChange)="updateTabIndex($event)" mat-stretch-tabs="false" mat-align-tabs="center"
-      headerPosition="below" animationDuration="0ms" preserveContent>
+    <mat-tab-group
+      (selectedTabChange)="updateTabIndex($event)"
+      mat-stretch-tabs="false"
+      mat-align-tabs="center"
+      headerPosition="below"
+      animationDuration="0ms"
+      preserveContent
+    >
       <mat-tab label="Popularity Query">
         <canvas style="width: 60vw; padding-bottom: 20px;" id="popularity_chart"></canvas>
       </mat-tab>
       <mat-tab label="Explicit Tracks">
         <canvas style="width: 60vw; padding-bottom: 20px;" id="explicit_chart"></canvas>
       </mat-tab>
-      <mat-tab label="Query 3">
-        <canvas style="width: 60vw; padding-bottom: 20px;" id="q3_chart"></canvas>
+      <mat-tab label="Avg duration">
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="duration_chart"></canvas>
       </mat-tab>
       <mat-tab label="Genre">
         <canvas style="width: 60vw; padding-bottom: 20px;" id="genre_chart"></canvas>
