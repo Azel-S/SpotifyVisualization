@@ -11,20 +11,43 @@ import { map, startWith } from 'rxjs/operators';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-
 export class HomeComponent {
   constructor(public service: DataService) {
     this.service.update_years(this.years);
     this.service.update_regions(this.regions);
-    this.service.update_genres(this.genres.list)
-    this.genres.filter = this.genres.control.valueChanges.pipe(startWith(''), map(value => this.filterGenre(value!)));
+    this.service.update_genres(this.genres.list);
+    this.genres.filter = this.genres.control.valueChanges.pipe(
+      startWith(''),
+      map((value) => this.filterGenre(value!))
+    );
   }
 
   // VARIABLES
-  years: { min: number, max: number, selected_min: number, selected_max: number } = { min: 0, max: 0, selected_min: 0, selected_max: 0 }
-  regions: { list: string[], selected_1: string, selected_2: string } = { list: [], selected_1: "", selected_2: "" };
-  genres: { list: string[], control: FormControl, filter: Observable<string[]> } = { list: [], control: new FormControl(''), filter: new Observable<string[]>() }
-  charts: { popularity: Boolean, explicit: Boolean } = { popularity: false, explicit: false };
+  years: {
+    min: number;
+    max: number;
+    selected_min: number;
+    selected_max: number;
+  } = { min: 0, max: 0, selected_min: 0, selected_max: 0 };
+  regions: { list: string[]; selected_1: string; selected_2: string } = {
+    list: [],
+    selected_1: '',
+    selected_2: '',
+  };
+  genres: {
+    list: string[];
+    control: FormControl;
+    filter: Observable<string[]>;
+  } = {
+    list: [],
+    control: new FormControl(''),
+    filter: new Observable<string[]>(),
+  };
+  charts: { popularity: Boolean; explicit: Boolean; duration: Boolean } = {
+    popularity: false,
+    explicit: false,
+    duration: false,
+  };
 
   tabIndex: number = 0;
 
@@ -34,30 +57,60 @@ export class HomeComponent {
   }
 
   filterGenre(value: string): string[] {
-    return this.genres.list.filter(option => option.toLowerCase().includes(value.toLowerCase()));
+    return this.genres.list.filter((option) =>
+      option.toLowerCase().includes(value.toLowerCase())
+    );
   }
 
   submit() {
     if (this.tabIndex == 0) {
       if (!this.charts.popularity) {
-        new Chart('popularity_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        new Chart('popularity_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
         this.charts.popularity = true;
       }
 
-      this.service.update_popularity(this.years.selected_min, this.years.selected_max, Chart.getChart('popularity_chart')!);
+      this.service.update_popularity(
+        this.years.selected_min,
+        this.years.selected_max,
+        Chart.getChart('popularity_chart')!
+      );
     } else if (this.tabIndex == 1) {
       if (!this.charts.explicit) {
-        new Chart('explicit_chart', { type: 'bar', data: { labels: [], datasets: [] } });
+        new Chart('explicit_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
         this.charts.explicit = true;
       }
 
-      this.service.update_explicit(this.years.selected_min, this.years.selected_max, Chart.getChart('explicit_chart')!);
+      this.service.update_explicit(
+        this.years.selected_min,
+        this.years.selected_max,
+        Chart.getChart('explicit_chart')!
+      );
+    } else if (this.tabIndex == 2) {
+      if (!this.charts.duration) {
+        new Chart('duration_chart', {
+          type: 'bar',
+          data: { labels: [], datasets: [] },
+        });
+        this.charts.duration = true;
+      }
+
+      this.service.update_duration(
+        this.years.selected_min,
+        this.years.selected_max,
+        Chart.getChart('duration_chart')!
+      );
     } else {
-      this.service.notify("Unexpected tab, please investigate.");
+      this.service.notify('Unexpected tab, please investigate.');
     }
   }
 
   test() {
-    this.service.notify("Current Tab: " + this.tabIndex.toString());
+    this.service.notify('Current Tab: ' + this.tabIndex.toString());
   }
 }
