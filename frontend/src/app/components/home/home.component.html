@@ -46,19 +46,31 @@
           </div>
         </mat-card>
 
-        <!-- GENRE -->
+        <!-- GENRE (VS GENRE) -->
         <div>
-          <mat-card *ngIf="[2, 3, 4].includes(tabIndex)"
+          <mat-card *ngIf="[2, 3].includes(tabIndex)"
             style="width: 30vw; padding-top: 40px; padding-left: 20px; padding-bottom: 20px; padding-right: 20px;">
-            <mat-form-field appearance="outline">
-              <mat-label>Genre</mat-label>
-              <input matInput [formControl]="genres.control" [matAutocomplete]="auto">
-              <mat-autocomplete #auto="matAutocomplete">
-                <mat-option *ngFor="let option of genres.filter | async" [value]="option">
-                  {{option}}
-                </mat-option>
-              </mat-autocomplete>
-            </mat-form-field>
+            <div style="display: flex; direction: row;justify-content: center; align-items: center; gap: 20px 20px">
+              <mat-form-field appearance="outline">
+                <mat-label>Genre 1</mat-label>
+                <input matInput [formControl]="genre_1.control" [matAutocomplete]="auto1">
+                <mat-autocomplete #auto1="matAutocomplete" (optionSelected)="updateGenre1($event)">
+                  <mat-option *ngFor="let option of genre_1.filter | async" [value]="option">
+                    {{option}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+              <mat-card-subtitle>VS</mat-card-subtitle>
+              <mat-form-field *ngIf="[3].includes(tabIndex)" appearance="outline">
+                <mat-label>Genre 2</mat-label>
+                <input matInput [formControl]="genre_2.control" [matAutocomplete]="auto2">
+                <mat-autocomplete #auto2="matAutocomplete" (optionSelected)="updateGenre2($event)">
+                  <mat-option *ngFor="let option of genre_2.filter | async" [value]="option">
+                    {{option}}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
           </mat-card>
         </div>
       </div>
@@ -75,19 +87,19 @@
     <mat-tab-group (selectedTabChange)="updateTabIndex($event)" mat-stretch-tabs="false" mat-align-tabs="center"
       headerPosition="below" animationDuration="0ms" preserveContent>
       <mat-tab label="Popularity Query">
-        <canvas style="width: 60vw;" id="popularity_chart"></canvas>
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="popularity_chart"></canvas>
       </mat-tab>
       <mat-tab label="Explicit Tracks">
-          <canvas style="width: 60vw;" id="explicit_chart"></canvas>
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="explicit_chart"></canvas>
       </mat-tab>
       <mat-tab label="Query 3">
-          <canvas style="width: 60vw;" id="q3_chart"></canvas>
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="q3_chart"></canvas>
       </mat-tab>
-      <mat-tab label="Query 4">
-          <canvas style="width: 60vw;" id="q4_chart"></canvas>
+      <mat-tab label="Genre">
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="genre_chart"></canvas>
       </mat-tab>
       <mat-tab label="Query 5">
-          <canvas style="width: 60vw;" id="q5_chart"></canvas>
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="q5_chart"></canvas>
       </mat-tab>
     </mat-tab-group>
   </mat-grid-tile>

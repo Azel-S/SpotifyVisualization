@@ -82,6 +82,7 @@ func (db *DB) GetRegions(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.database.Query(`
 		SELECT      distinct region
 		FROM        "SHAH.S".countries
+		ORDER BY	region ASC
 		`)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
@@ -125,6 +126,7 @@ func (db *DB) GetGenres(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.database.Query(`
 		SELECT      distinct genre
 		FROM        "SHAH.S".artist_to_genres
+		ORDER BY	genre ASC
 		`)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))

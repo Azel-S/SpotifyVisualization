@@ -33,6 +33,7 @@ func main() {
 	// Set API query links
 	http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
 	http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
+	http.HandleFunc("/api/v0/GetGenreFollowers", db.GetGenreFollowers)
 	// http.HandleFunc("/api/v0/query_1", db.query_2)
 
 	// Start server

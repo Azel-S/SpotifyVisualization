@@ -122,4 +122,24 @@ export class DataService {
         console.log(res);
       });;
   }
+  async update_genre(startYear: number, endYear: number, genre_1: string, genre_2: string,  chart: Chart) {
+    lastValueFrom(
+      this.http.get<any>(this.getAPI() + '/api/v0/GetGenreFollowers', {
+        headers: new HttpHeaders({}),
+        params: new HttpParams().set('start_year', startYear).set('end_year', endYear).set('genre_1', genre_1).set('genre_2', genre_2)
+      })
+    ).then((res) => {
+      if (res.years && res.followers_1 && res.followers_2) {
+        chart.data = { labels: res.years, datasets: [{ label: genre_1, data: res.followers_1 }, { label:  genre_2, data: res.followers_2 }] };
+        chart.update()
+      } else {
+        this.notify('Request failed, read console.');
+        console.log(res);
+      }
+    })
+      .catch((res) => {
+        this.notify('Request failed, read console.');
+        console.log(res);
+      });;
+  }
 }
