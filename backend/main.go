@@ -25,6 +25,8 @@ func main() {
 	db := database.DB{}
 	db.Initalize(getEnv("USER"), getEnv("PASSWORD"))
 
+	http.HandleFunc("/api/v0/CountTuples", db.CountTuples)
+
 	// Set API links to be handled
 	http.HandleFunc("/api/v0/GetYearRange", db.GetYearRange)
 	http.HandleFunc("/api/v0/GetRegions", db.GetRegions)
