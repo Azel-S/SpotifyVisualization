@@ -7,15 +7,19 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
+import { lastValueFrom } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+
 @Component({
   selector: 'app-root',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  constructor(public service: DataService) {
+  constructor(private http: HttpClient, public service: DataService) {
     this.service.update_years(this.years);
     this.service.update_regions(this.regions);
+    this.service.update_subregions(this.subregions);
     this.service.update_genres(this.genre_1.list)
     this.service.update_genres(this.genre_2.list)
     this.genre_1.filter = this.genre_1.control.valueChanges.pipe(startWith(''), map(value => this.filterGenre1(value!)));
@@ -24,10 +28,12 @@ export class HomeComponent {
 
   // VARIABLES
   years: { min: number, max: number, selected_min: number, selected_max: number } = { min: 0, max: 0, selected_min: 0, selected_max: 0 }
+  attributes: { list: string[], selected_1: string, selected_2: string } = { list: ["acousticness", "danceability", "energy", "speechiness", "loudness", "instrumentalness", "liveness", "tempo", "duration", "valence"], selected_1: "", selected_2: "" };
   regions: { list: string[], selected_1: string, selected_2: string } = { list: [], selected_1: "", selected_2: "" };
+  subregions: { list: string[], selected: string } = { list: [], selected: "" };
   genre_1: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "pop", control: new FormControl(''), filter: new Observable<string[]>() }
   genre_2: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "rock", control: new FormControl(''), filter: new Observable<string[]>() }
-  charts: { popularity: Boolean, explicit: Boolean, duration: Boolean, genre: Boolean } = { popularity: false, explicit: false, duration: false, genre: false };
+  charts: { popularity: Boolean, explicit: Boolean, duration: Boolean, genre: Boolean, title: Boolean } = { popularity: false, explicit: false, duration: false, genre: false, title: false };
 
   tabIndex: number = 0;
 
@@ -70,25 +76,28 @@ export class HomeComponent {
     } else if (this.tabIndex == 1) {
       if (!this.charts.explicit) {
         new Chart('explicit_chart', {
-          type: 'bar',
+          type: 'line',
           data: { labels: [], datasets: [] },
         });
         this.charts.explicit = true;
       }
 
-      this.service.update_explicit(this.years.selected_min, this.years.selected_max, Chart.getChart('explicit_chart')!);
+      this.service.update_explicit(this.years.selected_min, this.years.selected_max,  this.subregions.selected, Chart.getChart('explicit_chart')!);
     } else if (this.tabIndex == 2) {
       if (!this.charts.duration) {
         new Chart('duration_chart', {
-          type: 'bar',
+          type: 'line',
           data: { labels: [], datasets: [] },
         });
         this.charts.duration = true;
       }
 
-      this.service.update_duration(
+      this.service.update_attribute(
         this.years.selected_min,
         this.years.selected_max,
+        this.attributes.selected_1,
+        this.attributes.selected_2,
+        this.genre_1.selected,
         Chart.getChart('duration_chart')!
       )
     }
@@ -99,6 +108,13 @@ export class HomeComponent {
       }
 
       this.service.update_genre(this.years.selected_min, this.years.selected_max, this.genre_1.selected, this.genre_2.selected, Chart.getChart('genre_chart')!);
+    } else if (this.tabIndex == 4) {
+      if (!this.charts.title) {
+        new Chart('title_chart', { type: 'line', data: { labels: [], datasets: [] } });
+        this.charts.title = true;
+      }
+
+      this.service.update_title_length(this.years.selected_min, this.years.selected_max, this.regions.selected_1, this.regions.selected_2, Chart.getChart('title_chart')!);
     } else {
       this.service.notify('Unexpected tab, please investigate.');
     }
@@ -106,5 +122,12 @@ export class HomeComponent {
 
   test() {
     this.service.notify('Current Tab: ' + this.tabIndex.toString());
+  }
+  count() {
+    this.service.update_tuples();
+  }
+
+  reload() {
+    window.location.reload()
   }
 }

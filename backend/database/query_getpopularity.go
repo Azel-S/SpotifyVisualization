@@ -39,12 +39,7 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 
 		// Execute query
 		rows, err := db.database.Query(`
-			SELECT      t.release_year, SUM(t.popularity)
-			FROM        "SHAH.S".tracks t
-			WHERE       t.release_year >= :1 AND
-						t.release_year <= :2
-			GROUP BY    t.release_year
-			ORDER BY    t.release_year ASC
+		SELECT MEDIAN(loudness)/(MEDIAN(popularity)+0.01), RELEASE_YEAR FROM "SHAH.S".TRACKS where release_year >= :1 AND release_year <= :2 GROUP BY RELEASE_YEAR ORDER BY RELEASE_YEAR 
 			`, input.StartYear, input.EndYear)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))

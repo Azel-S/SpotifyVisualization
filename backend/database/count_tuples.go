@@ -18,26 +18,7 @@ func (db *DB) CountTuples(w http.ResponseWriter, r *http.Request) {
 		totalTuples := 0
 		// Execute query
 		rows, err := db.database.Query(`
-		SELECT T+S+R+Q+P+O+N FROM (SELECT COUNT(*) AS t FROM "SHAH.S".tracks), (SELECT COUNT(*) AS S FROM(
-		    SELECT      *
-		    FROM        "SHAH.S".track_to_countries
-
-		    UNION ALL
-
-		    SELECT      *
-		    FROM        "CARLO.QUICK".track_to_countries
-
-		    UNION ALL
-		
-		    SELECT      *
-		    FROM        "SKULTHUM.RASHID".track_to_countries
-
-		    UNION ALL
-
-		    SELECT      *
-		    FROM        "DDEXTER".track_to_countries
-		)
-		), (SELECT COUNT(*) AS R FROM "SHAH.S".artists),(SELECT COUNT(*) AS Q FROM "SHAH.S".artist_to_tracks), (SELECT COUNT(*) AS P FROM "SHAH.S".artist_to_genres), (SELECT COUNT(*) AS O FROM "SHAH.S".countries), (SELECT COUNT(*) AS N FROM "SHAH.S".country_to_code)
+		SELECT T+S+R+Q+P+O+N FROM (SELECT COUNT(*) AS T FROM "SHAH.S".tracks), (SELECT COUNT(*) AS S FROM "SHAH.S".track_to_countries), (SELECT COUNT(*) AS R FROM "SHAH.S".artists),(SELECT COUNT(*) AS Q FROM "SHAH.S".artist_to_tracks), (SELECT COUNT(*) AS P FROM "SHAH.S".artist_to_genres), (SELECT COUNT(*) AS O FROM "SHAH.S".countries), (SELECT COUNT(*) AS N FROM "SHAH.S".country_to_code)
 		`)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))

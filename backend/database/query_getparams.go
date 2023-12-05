@@ -108,6 +108,50 @@ func (db *DB) GetRegions(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (db *DB) GetSubregions(w http.ResponseWriter, r *http.Request) {
+	// Handles CORS and OPTIONS
+	if !utils.HandleCORS(w, r) {
+		// Only allow Get Methods
+		if r.Method != http.MethodGet {
+			utils.RespondWithError(w, http.StatusBadRequest, "GET method required")
+			return
+		}
+
+		// Output structure
+		var output struct {
+			Subregions []string `json:"subregions"`
+		}
+
+		// Execute query
+		rows, err := db.database.Query(`
+		SELECT      distinct subregion
+		FROM        "SHAH.S".countries
+		ORDER BY	subregion ASC
+		`)
+		if err != nil {
+			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			return
+		}
+
+		// Put result of query into output structure
+		defer rows.Close()
+		var region string
+		for rows.Next() {
+			// Each row's values are put in temporary variables
+			err = rows.Scan(&region)
+			if err != nil {
+				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				return
+			}
+
+			// The temporary variables are appended to the output structure
+			output.Subregions = append(output.Subregions, region)
+		}
+
+		utils.RespondWithJSON(w, http.StatusOK, output)
+	}
+}
+
 func (db *DB) GetGenres(w http.ResponseWriter, r *http.Request) {
 	// Handles CORS and OPTIONS
 	if !utils.HandleCORS(w, r) {

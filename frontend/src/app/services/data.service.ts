@@ -8,7 +8,7 @@ import { Chart } from 'chart.js';
   providedIn: 'root',
 })
 export class DataService {
-  constructor(private http: HttpClient, private snackBar: MatSnackBar) {}
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) { }
 
   // Notify
   notify(message: string, action: string = 'Close', duration: number = 2000) {
@@ -17,6 +17,10 @@ export class DataService {
 
   // API Link
   saveAPI(api: string) {
+    if (api[api.length - 1] == '/') {
+      api = api.substring(0, api.length - 1)
+    }
+
     localStorage.setItem('api', api);
   }
 
@@ -79,6 +83,31 @@ export class DataService {
       });
   }
 
+  async update_subregions(subregions: {
+    list: string[];
+    selected: string;
+  }) {
+    lastValueFrom(
+      this.http.get<any>(this.getAPI() + '/api/v0/GetSubregions', {
+        headers: new HttpHeaders({}),
+      })
+    )
+      .then((res) => {
+        subregions.list.length = 0;
+
+        (res.subregions as string[]).forEach((subregion) => {
+          subregions.list.push(subregion);
+        });
+
+        if (subregions.list.length > 0) {
+          subregions.selected = subregions.list[0];
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   async update_genres(genres: string[]) {
     lastValueFrom(
       this.http.get<any>(this.getAPI() + '/api/v0/GetGenres', {
@@ -125,13 +154,14 @@ export class DataService {
       });
   }
 
-  async update_explicit(startYear: number, endYear: number, chart: Chart) {
+  async update_explicit(startYear: number, endYear: number, subregion: string, chart: Chart) {
     lastValueFrom(
       this.http.get<any>(this.getAPI() + '/api/v0/GetExplicit', {
         headers: new HttpHeaders({}),
         params: new HttpParams()
           .set('start_year', startYear)
-          .set('end_year', endYear),
+          .set('end_year', endYear)
+          .set('subregion', subregion)
       })
     )
       .then((res) => {
@@ -152,23 +182,23 @@ export class DataService {
       });
   }
 
-  async update_duration(startYear: number, endYear: number, chart: Chart) {
+  async update_attribute(startYear: number, endYear: number, attribute1: string, attribute2: string, genre: string, chart: Chart) {
     lastValueFrom(
-      this.http.get<any>(this.getAPI() + '/api/v0/GetAvgDuration', {
+      this.http.get<any>(this.getAPI() + '/api/v0/GetAttributeComparison', {
         headers: new HttpHeaders({}),
         params: new HttpParams()
           .set('start_year', startYear)
-          .set('end_year', endYear),
+          .set('end_year', endYear)
+          .set('attribute_1', attribute1)
+          .set('attribute_2', attribute2)
+          .set('genre', genre)
       })
     )
       .then((res) => {
         console.log(res);
-        if (res.years && res.duration) {
-          chart.data = {
-            labels: res.years,
-            datasets: [{ label: 'Duration', data: res.duration }],
-          };
-          chart.update();
+        if (res.years && res.attribute_1 && res.attribute_2) {
+          chart.data = { labels: res.years, datasets: [{ label: attribute1, data: res.attribute_1 }, { label: attribute2, data: res.attribute_2 }] };
+          chart.update()
         } else {
           this.notify('Request failed, read console.');
           console.log(res);
@@ -179,7 +209,8 @@ export class DataService {
         console.log(res);
       });
   }
-  async update_genre(startYear: number, endYear: number, genre_1: string, genre_2: string,  chart: Chart) {
+
+  async update_genre(startYear: number, endYear: number, genre_1: string, genre_2: string, chart: Chart) {
     lastValueFrom(
       this.http.get<any>(this.getAPI() + '/api/v0/GetGenreFollowers', {
         headers: new HttpHeaders({}),
@@ -187,7 +218,7 @@ export class DataService {
       })
     ).then((res) => {
       if (res.years && res.followers_1 && res.followers_2) {
-        chart.data = { labels: res.years, datasets: [{ label: genre_1, data: res.followers_1 }, { label:  genre_2, data: res.followers_2 }] };
+        chart.data = { labels: res.years, datasets: [{ label: genre_1, data: res.followers_1 }, { label: genre_2, data: res.followers_2 }] };
         chart.update()
       } else {
         this.notify('Request failed, read console.');
@@ -198,5 +229,39 @@ export class DataService {
         this.notify('Request failed, read console.');
         console.log(res);
       });;
+  }
+
+  async update_title_length(startYear: number, endYear: number, region_1: string, region_2: string, chart: Chart) {
+    lastValueFrom(
+      this.http.get<any>(this.getAPI() + '/api/v0/GetTitleLength', {
+        headers: new HttpHeaders({}),
+        params: new HttpParams().set('start_year', startYear).set('end_year', endYear).set('region_1', region_1).set('region_2', region_2)
+      })
+    ).then((res) => {
+      if (res.years && res.title_1 && res.title_2) {
+        chart.data = { labels: res.years, datasets: [{ label: region_1, data: res.title_1 }, { label: region_2, data: res.title_2 }] };
+        chart.update()
+      } else {
+        this.notify('Request failed, read console.');
+        console.log(res);
+      }
+    })
+      .catch((res) => {
+        this.notify('Request failed, read console.');
+        console.log(res);
+      });;
+  }
+  async update_tuples() {
+    lastValueFrom(
+      this.http.get<any>(this.getAPI() + '/api/v0/CountTuples', {
+        headers: new HttpHeaders({}),
+      })
+    )
+      .then((res) => {
+        this.notify('Group 01 has ' + res + ' total tuples!');
+      })
+      .catch((res) => {
+        this.notify('Request failed, read console.');
+      });
   }
 }

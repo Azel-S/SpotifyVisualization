@@ -30,6 +30,7 @@ func main() {
 	// Set API links to be handled
 	http.HandleFunc("/api/v0/GetYearRange", db.GetYearRange)
 	http.HandleFunc("/api/v0/GetRegions", db.GetRegions)
+	http.HandleFunc("/api/v0/GetSubregions", db.GetSubregions)
 	http.HandleFunc("/api/v0/GetGenres", db.GetGenres)
 
 	// Set API query links
@@ -37,6 +38,8 @@ func main() {
 	http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
 	http.HandleFunc("/api/v0/GetGenreFollowers", db.GetGenreFollowers)
 	http.HandleFunc("/api/v0/GetAvgDuration", db.GetAvgDuration)
+	http.HandleFunc("/api/v0/GetTitleLength", db.GetTitleLength)
+	http.HandleFunc("/api/v0/GetAttributeComparison", db.GetAttributeComparison)
 	// http.HandleFunc("/api/v0/query_1", db.query_2)
 
 	// Start server
