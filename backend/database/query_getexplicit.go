@@ -41,30 +41,9 @@ func (db *DB) GetExplicit(w http.ResponseWriter, r *http.Request) {
 
 		// Execute query
 		rows, err := db.database.Query(`
-		WITH track_to_countries_mixed AS
-		(
-		    SELECT      *
-		    FROM        "SHAH.S".track_to_countries
-		
-		    UNION ALL
-		
-		    SELECT      *
-		    FROM        "CARLO.QUICK".track_to_countries
-		
-		    UNION ALL
-		
-		    SELECT      *
-		    FROM        "SKULTHUM.RASHID".track_to_countries
-		
-		    UNION ALL
-		
-		    SELECT      *
-		    FROM        "DDEXTER".track_to_countries
-		)
-
 		SELECT      t.release_year, COUNT(*)
 		FROM        "SHAH.S".tracks t
-		JOIN        track_to_countries_mixed ttc ON t.track_id = ttc.track_id
+		JOIN        track_to_countries ttc ON t.track_id = ttc.track_id
 		JOIN        "SHAH.S".country_to_code ctc ON ttc.code = ctc.code
 		JOIN        "SHAH.S".countries c ON ctc.country = c.name
 		WHERE       c.subregion = :1 AND 

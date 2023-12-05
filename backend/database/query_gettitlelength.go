@@ -29,7 +29,7 @@ func (db *DB) GetTitleLength(w http.ResponseWriter, r *http.Request) {
 
 		// Output structure
 		var output struct {
-			Years   []int `json:"years"`
+			Years   []int     `json:"years"`
 			Title_1 []float64 `json:"title_1"`
 			Title_2 []float64 `json:"title_2"`
 		}
@@ -52,8 +52,6 @@ func (db *DB) GetTitleLength(w http.ResponseWriter, r *http.Request) {
 			utils.RespondWithError(w, http.StatusBadRequest, "start_year or end_year not specified")
 			return
 		}
-
-		fmt.Print("im here")
 
 		// Execute query
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
@@ -98,14 +96,12 @@ func (db *DB) GetTitleLength(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Print("im here2")
-
 		// Put result of query into output structure
 		defer rows.Close()
 		var (
 			year    int
-			title_1 float64 
-			title_2 float64 
+			title_1 float64
+			title_2 float64
 		)
 		for rows.Next() {
 			// Each row's values are put in temporary variables

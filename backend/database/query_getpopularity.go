@@ -18,6 +18,7 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 
 		// Input structure
 		var input struct {
+			Attribute string
 			StartYear int
 			EndYear   int
 		}
@@ -30,6 +31,7 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 
 		// Grab input values from url
 		if r.URL.Query().Get("start_year") != "" && r.URL.Query().Get("end_year") != "" {
+			input.Attribute = r.URL.Query().Get("attribute")
 			input.StartYear, _ = strconv.Atoi(r.URL.Query().Get("start_year"))
 			input.EndYear, _ = strconv.Atoi(r.URL.Query().Get("end_year"))
 		} else {
@@ -37,14 +39,35 @@ func (db *DB) GetPopularity(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		var myQuery = `
+		select t.release_year, (median(t.popularity)/(median(t.` + input.Attribute + `)+0.001))`
+
+		myQuery = myQuery +
+			`
+			FROM "SHAH.S".TRACKS t
+			where release_year >= :1 AND release_year <= :2
+			GROUP BY RELEASE_YEAR 
+			ORDER BY RELEASE_YEAR 
+		`
+
 		// Execute query
-		rows, err := db.database.Query(`
-		SELECT RELEASE_YEAR, MEDIAN(loudness)/(MEDIAN(popularity)+0.01) FROM "SHAH.S".TRACKS where release_year >= :1 AND release_year <= :2 GROUP BY RELEASE_YEAR ORDER BY RELEASE_YEAR 
-			`, input.StartYear, input.EndYear)
+		rows, err := db.database.Query(myQuery, input.StartYear, input.EndYear)
 		if err != nil {
 			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
 			return
 		}
+
+		// // Execute query
+		// rows, err := db.database.Query(`
+		// SELECT RELEASE_YEAR, (MEDIAN(popularity)/MEDIAN(loudness))
+		// FROM "SHAH.S".TRACKS where release_year >= :1 AND release_year <= :2
+		// GROUP BY RELEASE_YEAR
+		// ORDER BY RELEASE_YEAR
+		// 	`, input.StartYear, input.EndYear)
+		// if err != nil {
+		// 	utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+		// 	return
+		// }
 
 		// Put result of query into output structure
 		defer rows.Close()

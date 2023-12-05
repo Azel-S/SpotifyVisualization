@@ -93,6 +93,7 @@ export class DataService {
       })
     )
       .then((res) => {
+        console.log(res)
         subregions.list.length = 0;
 
         (res.subregions as string[]).forEach((subregion) => {
@@ -127,13 +128,14 @@ export class DataService {
   }
 
   // Backend Graph Updaters
-  async update_popularity(startYear: number, endYear: number, chart: Chart) {
+  async update_popularity(startYear: number, endYear: number, attribute: string, chart: Chart) {
     lastValueFrom(
       this.http.get<any>(this.getAPI() + '/api/v0/GetPopularity', {
         headers: new HttpHeaders({}),
         params: new HttpParams()
           .set('start_year', startYear)
-          .set('end_year', endYear),
+          .set('end_year', endYear)
+          .set('attribute', attribute)
       })
     )
       .then((res) => {
@@ -212,13 +214,13 @@ export class DataService {
 
   async update_genre(startYear: number, endYear: number, genre_1: string, genre_2: string, chart: Chart) {
     lastValueFrom(
-      this.http.get<any>(this.getAPI() + '/api/v0/GetGenreFollowers', {
+      this.http.get<any>(this.getAPI() + '/api/v0/GetGenrePopularity', {
         headers: new HttpHeaders({}),
         params: new HttpParams().set('start_year', startYear).set('end_year', endYear).set('genre_1', genre_1).set('genre_2', genre_2)
       })
     ).then((res) => {
-      if (res.years && res.followers_1 && res.followers_2) {
-        chart.data = { labels: res.years, datasets: [{ label: genre_1, data: res.followers_1 }, { label: genre_2, data: res.followers_2 }] };
+      if (res.years && res.popularity_1 && res.popularity_2) {
+        chart.data = { labels: res.years, datasets: [{ label: genre_1, data: res.popularity_1 }, { label: genre_2, data: res.popularity_2 }] };
         chart.update()
       } else {
         this.notify('Request failed, read console.');
@@ -258,7 +260,7 @@ export class DataService {
       })
     )
       .then((res) => {
-        this.notify('Group 01 has ' + res + ' total tuples!');
+        this.notify('Group 01 has ' + res + ' total tuples!', "Close", 0);
       })
       .catch((res) => {
         this.notify('Request failed, read console.');

@@ -7,16 +7,14 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 
-import { lastValueFrom } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-
 @Component({
   selector: 'app-root',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
+
 export class HomeComponent {
-  constructor(private http: HttpClient, public service: DataService) {
+  constructor(public service: DataService) {
     this.service.update_years(this.years);
     this.service.update_regions(this.regions);
     this.service.update_subregions(this.subregions);
@@ -33,13 +31,73 @@ export class HomeComponent {
   subregions: { list: string[], selected: string } = { list: [], selected: "" };
   genre_1: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "pop", control: new FormControl(''), filter: new Observable<string[]>() }
   genre_2: { list: string[], selected: string, control: FormControl, filter: Observable<string[]> } = { list: [], selected: "rock", control: new FormControl(''), filter: new Observable<string[]>() }
-  charts: { popularity: Boolean, explicit: Boolean, duration: Boolean, genre: Boolean, title: Boolean } = { popularity: false, explicit: false, duration: false, genre: false, title: false };
+  charts: { popularity: Boolean, explicit: Boolean, attribute: Boolean, genre: Boolean, title: Boolean } = { popularity: false, explicit: false, attribute: false, genre: false, title: false };
 
   tabIndex: number = 0;
 
   // FUNCTIONS
   updateTabIndex(event: MatTabChangeEvent) {
     this.tabIndex = event.index;
+
+    switch (this.tabIndex) {
+      case 0: {
+        if (!this.charts.popularity) {
+          new Chart('popularity_chart', {
+            type: 'bar', data: { labels: [], datasets: [] },
+            options: { scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Ratio of Popularity to Attribute' } } } }
+          });
+          this.charts.popularity = true;
+        }
+        break;
+      }
+      case 1: {
+        if (!this.charts.explicit) {
+          new Chart('explicit_chart', {
+            type: 'line', data: { labels: [], datasets: [] },
+            options: { scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Number of Explicit Songs' } } } }
+          });
+          this.charts.explicit = true;
+        }
+        break;
+      }
+      case 2: {
+        if (!this.charts.attribute) {
+          new Chart('attribute_chart',
+            {
+              type: 'line', data: { labels: [], datasets: [] },
+              options: { scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Average Value of Attribute' } } } }
+            });
+          this.charts.attribute = true;
+        }
+        break;
+      }
+      case 3: {
+        if (!this.charts.genre) {
+          new Chart('genre_chart',
+            {
+              type: 'line', data: { labels: [], datasets: [] },
+              options: { scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Popularity of Genre' } } } }
+            });
+          this.charts.genre = true;
+        }
+        break;
+      }
+      case 4: {
+        if (!this.charts.title) {
+          new Chart('title_chart',
+            {
+              type: 'line',
+              data: { labels: [], datasets: [] },
+              options: { scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Length of Characters' } } } }
+            });
+          this.charts.title = true;
+        }
+        break;
+      }
+      default: {
+        break;
+      }
+    }
   }
 
   filterGenre1(value: string): string[] {
@@ -60,60 +118,27 @@ export class HomeComponent {
 
   submit() {
     if (this.tabIndex == 0) {
-      if (!this.charts.popularity) {
-        new Chart('popularity_chart', {
-          type: 'bar',
-          data: { labels: [], datasets: [] },
-        });
-        this.charts.popularity = true;
-      }
-
       this.service.update_popularity(
         this.years.selected_min,
         this.years.selected_max,
+        this.attributes.selected_1,
         Chart.getChart('popularity_chart')!
       );
     } else if (this.tabIndex == 1) {
-      if (!this.charts.explicit) {
-        new Chart('explicit_chart', {
-          type: 'line',
-          data: { labels: [], datasets: [] },
-        });
-        this.charts.explicit = true;
-      }
-
-      this.service.update_explicit(this.years.selected_min, this.years.selected_max,  this.subregions.selected, Chart.getChart('explicit_chart')!);
+      this.service.update_explicit(this.years.selected_min, this.years.selected_max, this.subregions.selected, Chart.getChart('explicit_chart')!);
     } else if (this.tabIndex == 2) {
-      if (!this.charts.duration) {
-        new Chart('duration_chart', {
-          type: 'line',
-          data: { labels: [], datasets: [] },
-        });
-        this.charts.duration = true;
-      }
-
       this.service.update_attribute(
         this.years.selected_min,
         this.years.selected_max,
         this.attributes.selected_1,
         this.attributes.selected_2,
         this.genre_1.selected,
-        Chart.getChart('duration_chart')!
+        Chart.getChart('attribute_chart')!
       )
     }
     else if (this.tabIndex == 3) {
-      if (!this.charts.genre) {
-        new Chart('genre_chart', { type: 'line', data: { labels: [], datasets: [] } });
-        this.charts.genre = true;
-      }
-
       this.service.update_genre(this.years.selected_min, this.years.selected_max, this.genre_1.selected, this.genre_2.selected, Chart.getChart('genre_chart')!);
     } else if (this.tabIndex == 4) {
-      if (!this.charts.title) {
-        new Chart('title_chart', { type: 'line', data: { labels: [], datasets: [] } });
-        this.charts.title = true;
-      }
-
       this.service.update_title_length(this.years.selected_min, this.years.selected_max, this.regions.selected_1, this.regions.selected_2, Chart.getChart('title_chart')!);
     } else {
       this.service.notify('Unexpected tab, please investigate.');

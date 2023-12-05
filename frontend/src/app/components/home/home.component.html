@@ -8,9 +8,9 @@
         height: 90vh;
       ">
       <!-- API URL -->
-      <div>
+      <div style="display: flex; flex-direction: row; justify-content: center; gap: 20px 20px;">
         <form>
-          <mat-form-field style="width: 30vw" appearance="outline">
+          <mat-form-field style="width: 20vw" appearance="outline">
             <mat-label>Backend URL</mat-label>
             <input matInput #api value="{{ this.service.getAPI() }}" />
             <button *ngIf="this.service.getAPI() != api.value" matSuffix mat-icon-button color="accent" type="submit"
@@ -19,6 +19,7 @@
             </button>
           </mat-form-field>
         </form>
+        <button style="width: 10vh; height: 5vh" mat-raised-button color="accent" (click)="count()">Count Tuples</button>
       </div>
 
       <!-- INPUT PARAMS -->
@@ -40,7 +41,7 @@
         </mat-card>
 
         <!-- ATTRIBUTES -->
-        <mat-card *ngIf="[2].includes(tabIndex)" style="
+        <mat-card *ngIf="[0,2].includes(tabIndex)" style="
             width: 30vw;
             padding-top: 40px;
             padding-left: 20px;
@@ -60,8 +61,8 @@
                 <mat-option *ngFor="let attribute of attributes.list" [value]="attribute">{{ attribute }}</mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-card-subtitle>AND</mat-card-subtitle>
-            <mat-form-field appearance="outline">
+            <mat-card-subtitle *ngIf="[2].includes(tabIndex)">AND</mat-card-subtitle>
+            <mat-form-field *ngIf="[2].includes(tabIndex)" appearance="outline">
               <mat-label>Attribute 2</mat-label>
               <mat-select [(ngModel)]="attributes.selected_2" name="selected_2">
                 <mat-option *ngFor="let attribute of attributes.list" [value]="attribute">{{ attribute }}</mat-option>
@@ -71,7 +72,7 @@
         </mat-card>
 
         <!-- REGIONS -->
-        <mat-card *ngIf="[3, 4].includes(tabIndex)" style="
+        <mat-card *ngIf="[4].includes(tabIndex)" style="
             width: 30vw;
             padding-top: 40px;
             padding-left: 20px;
@@ -179,26 +180,13 @@
         <canvas style="width: 60vw; padding-bottom: 20px;" id="explicit_chart"></canvas>
       </mat-tab>
       <mat-tab label="Attribute Comparison">
-        <canvas style="width: 60vw; padding-bottom: 20px;" id="duration_chart"></canvas>
+        <canvas style="width: 60vw; padding-bottom: 20px;" id="attribute_chart"></canvas>
       </mat-tab>
       <mat-tab label="Genre">
         <canvas style="width: 60vw; padding-bottom: 20px;" id="genre_chart"></canvas>
       </mat-tab>
       <mat-tab label="Title Length">
         <canvas style="width: 60vw; padding-bottom: 20px;" id="title_chart"></canvas>
-      </mat-tab>
-      <mat-tab label="Touple Count">
-        <div style="
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            gap: 20px 20px;
-            padding: 15px;
-          ">
-          <button style="width: 25vh" mat-raised-button color="accent" (click)="count()">
-            Count Tuples
-          </button>
-        </div>
       </mat-tab>
     </mat-tab-group>
   </mat-grid-tile>

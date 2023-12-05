@@ -36,11 +36,9 @@ func main() {
 	// Set API query links
 	http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
 	http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
-	http.HandleFunc("/api/v0/GetGenreFollowers", db.GetGenreFollowers)
-	http.HandleFunc("/api/v0/GetAvgDuration", db.GetAvgDuration)
+	http.HandleFunc("/api/v0/GetGenrePopularity", db.GetGenrePopularity)
 	http.HandleFunc("/api/v0/GetTitleLength", db.GetTitleLength)
 	http.HandleFunc("/api/v0/GetAttributeComparison", db.GetAttributeComparison)
-	// http.HandleFunc("/api/v0/query_1", db.query_2)
 
 	// Start server
 	fmt.Println("Serving at port: 8080")

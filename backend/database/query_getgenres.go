@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-// Gets followers of genre_1 and genre_2 (From start_year to end_year)
-func (db *DB) GetGenreFollowers(w http.ResponseWriter, r *http.Request) {
+// Gets popularity of genre_1 and genre_2 (From start_year to end_year)
+func (db *DB) GetGenrePopularity(w http.ResponseWriter, r *http.Request) {
 	// Handles CORS and OPTIONS
 	if !utils.HandleCORS(w, r) {
 		// Only allow Get Methods
@@ -26,9 +26,9 @@ func (db *DB) GetGenreFollowers(w http.ResponseWriter, r *http.Request) {
 
 		// Output structure
 		var output struct {
-			Years       []int `json:"years"`
-			Followers_1 []int `json:"followers_1"`
-			Followers_2 []int `json:"followers_2"`
+			Years        []int `json:"years"`
+			Popularity_1 []int `json:"popularity_1"`
+			Popularity_2 []int `json:"popularity_2"`
 		}
 
 		// Grab input values from url
@@ -81,20 +81,20 @@ func (db *DB) GetGenreFollowers(w http.ResponseWriter, r *http.Request) {
 		// Put result of query into output structure
 		defer rows.Close()
 		var (
-			year        int
-			followers_1 int
-			followers_2 int
+			year         int
+			popularity_1 int
+			popularity_2 int
 		)
 		for rows.Next() {
-			err = rows.Scan(&year, &followers_1, &followers_2)
+			err = rows.Scan(&year, &popularity_1, &popularity_2)
 			if err != nil {
 				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
 				return
 			}
 
 			output.Years = append(output.Years, year)
-			output.Followers_1 = append(output.Followers_1, followers_1)
-			output.Followers_2 = append(output.Followers_2, followers_2)
+			output.Popularity_1 = append(output.Popularity_1, popularity_1)
+			output.Popularity_2 = append(output.Popularity_2, popularity_2)
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, output)
