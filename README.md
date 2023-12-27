@@ -1,4 +1,4 @@
-# Spotify-Viz
+# Spotify-Trends Vizualizer (Spotify-Viz)
 This project aims to help visualize Spotify data through Angular/Java/SQL. Further information will be added as the course progresses.
 
 ## Links & Resources
