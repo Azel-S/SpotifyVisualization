@@ -1,5 +1,7 @@
 # Spotify-Trends Vizualizer (Spotify-Viz)
-This project aims to help visualize Spotify data through Angular/Java/SQL. Further information will be added as the course progresses.
+This project aims to help visualize Spotify data through Angular/Java/SQL.
+
+e.g. Popularity of Jazz vs Rock from 2000 - 2013 in North America
 
 ## Links & Resources
 [Spotify 1 Million Tracks Dataset](https://www.kaggle.com/datasets/amitanshjoshi/spotify-1million-tracks "Kaggle Link")  
