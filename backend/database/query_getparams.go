@@ -2,7 +2,12 @@ package database
 
 import (
 	"backend/utils"
+	"context"
+	"fmt"
 	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (db *DB) GetYearRange(w http.ResponseWriter, r *http.Request) {
@@ -14,48 +19,49 @@ func (db *DB) GetYearRange(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Output structure
 		var output struct {
-			StartYear int `json:"start_year"`
-			EndYear   int `json:"end_year"`
+			StartYear int `json:"start_year" bson:"start_year"`
+			EndYear   int `json:"end_year" bson:"end_year"`
 		}
 
-		// Execute query
-		rows1, err := db.database.Query(`
-		SELECT      MIN(release_year)
-		FROM        "SHAH.S".tracks
-		`)
+		// Get min_year
+		min_pipeline := mongo.Pipeline{
+			{{Key: "$group", Value: bson.D{{Key: "_id", Value: ""}, {Key: "start_year", Value: bson.D{{Key: "$min", Value: "$RELEASE_YEAR"}}}}}},
+		}
+
+		cursor, err := db.tracks.Aggregate(context.TODO(), min_pipeline)
 		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			fmt.Println("> ERROR: Could not get start_year: %w", err)
+			utils.RespondWithError(w, http.StatusInternalServerError, ("Could not get start_year: " + err.Error()))
 			return
 		}
 
-		// Put result of query into output structure
-		defer rows1.Close()
-		for rows1.Next() {
-			err = rows1.Scan(&output.StartYear)
+		for cursor.Next(context.TODO()) {
+			err = cursor.Decode(&output)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				fmt.Println("> ERROR: Could not decode start_year: %w", err)
+				utils.RespondWithError(w, http.StatusInternalServerError, ("Could not decode start_year: " + err.Error()))
 				return
 			}
 		}
 
-		// Execute query
-		rows2, err := db.database.Query(`
-		SELECT      MAX(release_year)
-		FROM        "SHAH.S".tracks
-		`)
+		// Get max_year
+		max_pipeline := mongo.Pipeline{
+			{{Key: "$group", Value: bson.D{{Key: "_id", Value: ""}, {Key: "end_year", Value: bson.D{{Key: "$max", Value: "$RELEASE_YEAR"}}}}}},
+		}
+
+		cursor, err = db.tracks.Aggregate(context.TODO(), max_pipeline)
 		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			fmt.Println("> ERROR: Could not get end_year: %w", err)
+			utils.RespondWithError(w, http.StatusInternalServerError, ("Could not get end_year: " + err.Error()))
 			return
 		}
 
-		// Put result of query into output structure
-		defer rows2.Close()
-		for rows2.Next() {
-			err = rows2.Scan(&output.EndYear)
+		for cursor.Next(context.TODO()) {
+			err = cursor.Decode(&output)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				fmt.Println("> ERROR: Could not decode end_year: %w", err)
+				utils.RespondWithError(w, http.StatusInternalServerError, ("Could not decode end_year: " + err.Error()))
 				return
 			}
 		}
@@ -73,35 +79,34 @@ func (db *DB) GetRegions(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Output structure
 		var output struct {
 			Regions []string `json:"regions"`
 		}
 
-		// Execute query
-		rows, err := db.database.Query(`
-		SELECT      distinct region
-		FROM        "SHAH.S".countries
-		ORDER BY	region ASC
-		`)
+		regions_pipeline := mongo.Pipeline{
+			{{Key: "$group", Value: bson.D{{Key: "_id", Value: "$REGION"}}}}, {{Key: "$sort", Value: bson.D{{Key: "_id", Value: 1}}}}, {{Key: "$project", Value: bson.D{{Key: "_id", Value: 0}, {Key: "REGION", Value: "$_id"}}}},
+		}
+
+		cursor, err := db.countries.Aggregate(context.TODO(), regions_pipeline)
 		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			fmt.Println("> ERROR: Could not get regions: %w", err)
+			utils.RespondWithError(w, http.StatusInternalServerError, ("could not get regions: " + err.Error()))
 			return
 		}
 
-		// Put result of query into output structure
-		defer rows.Close()
-		var region string
-		for rows.Next() {
-			// Each row's values are put in temporary variables
-			err = rows.Scan(&region)
+		for cursor.Next(context.TODO()) {
+			var temp struct {
+				Region string `bson:"region"`
+			}
+
+			err = cursor.Decode(&temp)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				fmt.Println("> ERROR: Could not decode region: %w", err)
+				utils.RespondWithError(w, http.StatusInternalServerError, ("could not decode region: " + err.Error()))
 				return
 			}
 
-			// The temporary variables are appended to the output structure
-			output.Regions = append(output.Regions, region)
+			output.Regions = append(output.Regions, temp.Region)
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, output)
@@ -117,35 +122,34 @@ func (db *DB) GetSubregions(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Output structure
 		var output struct {
 			Subregions []string `json:"subregions"`
 		}
 
-		// Execute query
-		rows, err := db.database.Query(`
-		SELECT      distinct subregion
-		FROM        "SHAH.S".countries
-		ORDER BY	subregion ASC
-		`)
+		subregions_pipeline := mongo.Pipeline{
+			{{Key: "$group", Value: bson.D{{Key: "_id", Value: "$SUBREGION"}}}}, {{Key: "$sort", Value: bson.D{{Key: "_id", Value: 1}}}}, {{Key: "$project", Value: bson.D{{Key: "_id", Value: 0}, {Key: "SUBREGION", Value: "$_id"}}}},
+		}
+
+		cursor, err := db.countries.Aggregate(context.TODO(), subregions_pipeline)
 		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			fmt.Println("> ERROR: Could not get subregions: %w", err)
+			utils.RespondWithError(w, http.StatusInternalServerError, ("could not get subregions: " + err.Error()))
 			return
 		}
 
-		// Put result of query into output structure
-		defer rows.Close()
-		var region string
-		for rows.Next() {
-			// Each row's values are put in temporary variables
-			err = rows.Scan(&region)
+		for cursor.Next(context.TODO()) {
+			var temp struct {
+				Subregion string `bson:"subregion"`
+			}
+
+			err = cursor.Decode(&temp)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				fmt.Println("> ERROR: Could not decode subregions: %w", err)
+				utils.RespondWithError(w, http.StatusInternalServerError, ("could not decode subregions: " + err.Error()))
 				return
 			}
 
-			// The temporary variables are appended to the output structure
-			output.Subregions = append(output.Subregions, region)
+			output.Subregions = append(output.Subregions, temp.Subregion)
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, output)
@@ -161,33 +165,34 @@ func (db *DB) GetGenres(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Output structure
 		var output struct {
 			Genres []string `json:"genres"`
 		}
 
-		// Execute query
-		rows, err := db.database.Query(`
-		SELECT      distinct genre
-		FROM        "SHAH.S".artist_to_genres
-		ORDER BY	genre ASC
-		`)
+		regions_pipeline := mongo.Pipeline{
+			{{Key: "$group", Value: bson.D{{Key: "_id", Value: "$GENRE"}}}}, {{Key: "$sort", Value: bson.D{{Key: "_id", Value: 1}}}}, {{Key: "$project", Value: bson.D{{Key: "_id", Value: 0}, {Key: "GENRE", Value: "$_id"}}}},
+		}
+
+		cursor, err := db.artist_to_genres.Aggregate(context.TODO(), regions_pipeline)
 		if err != nil {
-			utils.RespondWithError(w, http.StatusInternalServerError, ("Query exection failed: " + err.Error()))
+			fmt.Println("> ERROR: Could not get genres: %w", err)
+			utils.RespondWithError(w, http.StatusInternalServerError, ("could not get genres: " + err.Error()))
 			return
 		}
 
-		// Put result of query into output structure
-		defer rows.Close()
-		var genre string
-		for rows.Next() {
-			err = rows.Scan(&genre)
+		for cursor.Next(context.TODO()) {
+			var temp struct {
+				Genre string `bson:"genre"`
+			}
+
+			err = cursor.Decode(&temp)
 			if err != nil {
-				utils.RespondWithError(w, http.StatusInternalServerError, ("Row scan failed: " + err.Error()))
+				fmt.Println("> ERROR: Could not decode genres: %w", err)
+				utils.RespondWithError(w, http.StatusInternalServerError, ("could not decode genres: " + err.Error()))
 				return
 			}
 
-			output.Genres = append(output.Genres, genre)
+			output.Genres = append(output.Genres, temp.Genre)
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, output)
