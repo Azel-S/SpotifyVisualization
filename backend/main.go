@@ -68,7 +68,7 @@ func main() {
 	http.HandleFunc("/api/v0/GetGenres", db.GetGenres)
 
 	// Set API query links
-	// http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
+	http.HandleFunc("/api/v0/GetPopularity", db.GetPopularity)
 	// http.HandleFunc("/api/v0/GetExplicit", db.GetExplicit)
 	// http.HandleFunc("/api/v0/GetGenrePopularity", db.GetGenrePopularity)
 	// http.HandleFunc("/api/v0/GetTitleLength", db.GetTitleLength)
@@ -76,7 +76,7 @@ func main() {
 
 	// Start server
 	fmt.Println("> Starting Sever (Port 8080)")
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
 		panic(fmt.Errorf("ERROR: Could not start server: %w", err))
 	}
